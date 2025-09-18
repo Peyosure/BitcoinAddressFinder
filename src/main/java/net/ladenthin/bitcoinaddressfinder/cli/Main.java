@@ -132,8 +132,8 @@ public class Main implements Runnable, Interruptable {
     @Override
     public void run() {
         logger.info(configuration.command.name());
-        
-        addSchutdownHook();
+
+        addShutdownHook();
         
         switch (configuration.command) {
             case Find:
@@ -194,7 +194,7 @@ public class Main implements Runnable, Interruptable {
         }
     }
     
-    private void addSchutdownHook() {
+    private void addShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             logger.info("Shutdown received via hook.");
             interrupt();

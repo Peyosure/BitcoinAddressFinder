@@ -1,0 +1,20 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "camel: Run with JBang Opened Camel Application",
+            "type": "shell",
+            "command": "jbang",
+            "args": [
+                "-Dcamel.jbang.version=4.13.0",
+                "camel@apache/camel",
+                "run",
+                "${fileBasename}",
+                "--dev",
+                "--logging-level=info",
+                "--local-kamelet-dir=."
+            ],
+            "problemMatcher": []
+        }
+    ]
+}
