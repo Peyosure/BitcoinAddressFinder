@@ -20,7 +20,6 @@ package net.ladenthin.bitcoinaddressfinder;
 
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
-import java.io.IOException;
 import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;

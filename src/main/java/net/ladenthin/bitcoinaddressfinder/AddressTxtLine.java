@@ -139,24 +139,25 @@ public class AddressTxtLine {
             byte[] witnessProgram = invokeProtectedMethod(bechData, "witnessProgram", byte[].class);
             
             switch (witnessVersion) {
-                case WITNESS_VERSION_0:
+                case WITNESS_VERSION_0 -> {
                     if (witnessProgram.length == SegwitAddress.WITNESS_PROGRAM_LENGTH_PKH) {
                         ByteBuffer hash160 = keyUtility.byteBufferUtility.byteArrayToByteBuffer(witnessProgram);
                         return new AddressToCoin(hash160, amount, AddressType.P2WPKH); // P2WPKH supported
                     } else if (witnessProgram.length == SegwitAddress.WITNESS_PROGRAM_LENGTH_SH) {
-                        byte[] scriptHash = witnessProgram;
                         return null; // P2WSH not supported
                     }
-                    break;
-                case WITNESS_VERSION_1:
+                }
+                case WITNESS_VERSION_1 -> {
                     if (witnessProgram.length == SegwitAddress.WITNESS_PROGRAM_LENGTH_TR) {
+                        @SuppressWarnings("unused")
                         byte[] tweakedPublicKey = witnessProgram;
                         return null; // P2TR not supported
                     }
-                    break;
-                default:
+                }
+                default -> {
                     // not supported
                     return null;
+                }
             }
         } catch (AddressFormatException | ReflectiveOperationException  e) {
             // Bech32 parsing or reflection failed; continue to next format
@@ -247,6 +248,7 @@ public class AddressTxtLine {
      * Return the data, fully-decoded with 8-bits per byte.
      * @return The data, fully-decoded as a byte array.
      */
+    @SuppressWarnings("unused")
     private static byte[] decode5to8(byte[] bytes) throws ReflectiveOperationException {
         return invokeConvertBitsStatic(bytes, 0, bytes.length, 5, 8, false);
     }
@@ -255,11 +257,11 @@ public class AddressTxtLine {
         return invokeConvertBitsStatic(bytes, 0, bytes.length, 5, 8, true);
     }
     
+    @SuppressWarnings("unused")
     private static byte[] encode8to5(byte[] data) throws ReflectiveOperationException {
         return invokeConvertBitsStatic(data, 0, data.length, 8, 5, true);
     }
     
-    @SuppressWarnings("unchecked")
     private static byte[] invokeConvertBitsStatic(byte[] in, int inStart, int inLen, int fromBits, int toBits, boolean pad) throws ReflectiveOperationException {
         Method method = Bech32.class.getDeclaredMethod("convertBits", byte[].class, int.class, int.class, int.class, int.class, boolean.class);
         method.setAccessible(true);
@@ -268,8 +270,8 @@ public class AddressTxtLine {
         } catch (ReflectiveOperationException e) {
             // rethrow AddressFormatException if it's the underlying cause
             Throwable cause = e.getCause();
-            if (cause instanceof AddressFormatException) {
-                throw (AddressFormatException) cause;
+            if (cause instanceof AddressFormatException addressFormatException) {
+                throw addressFormatException;
             }
             throw e;
         }
@@ -304,6 +306,7 @@ public class AddressTxtLine {
             checksum = null;
         }
         
+        @SuppressWarnings("unused")
         boolean checksumMatches = false;
         if (version != null && checksum != null) {
             byte[] payload = new byte[version.length + hash160.length];
@@ -325,6 +328,7 @@ public class AddressTxtLine {
         // fallback
         AddressType addressType = AddressType.P2PKH_OR_P2SH;
         
+        @SuppressWarnings("unused")
         String versionAsHex = org.apache.commons.codec.binary.Hex.encodeHexString(version);
         AddressToCoin addressToCoin = new AddressToCoin(hash160AsByteBuffer, DEFAULT_COIN, addressType);
         return addressToCoin;

@@ -42,6 +42,27 @@ public class AddressFile extends AbstractPlaintextFile {
         keyUtility = new KeyUtility(network, new ByteBufferUtility(true));
     }
 
+    public AddressFile(File file, ReadStatistic readStatistic, Network network2, Consumer<AddressToCoin> addressConsumer2, Object unsupportedConsumer2, org.bitcoinj.base.@org.jspecify.annotations.NonNull Network network) {
+        this.network = network;
+        //TODO Auto-generated constructor stub
+        this.keyUtility = null;
+    }
+
+    public AddressFile(File file, ReadStatistic readStatistic, Network network2,
+            Consumer<AddressToCoin> addressConsumer2, Object unsupportedConsumer2) {
+        //TODO Auto-generated constructor stub
+    }
+
+    public AddressFile(File file, ReadStatistic readStatistic, Network network2,
+			Consumer<AddressToCoin> addressConsumer2, Object unsupportedConsumer2) {
+		//TODO Auto-generated constructor stub
+	}
+
+	public AddressFile(File file, ReadStatistic readStatistic, Network network2,
+            Consumer<AddressToCoin> addressConsumer2, Object unsupportedConsumer2) {
+        //TODO Auto-generated constructor stub
+    }
+
     @Override
     protected void processLine(String line) {
         AddressTxtLine addressTxtLine = new AddressTxtLine();
@@ -53,5 +74,9 @@ public class AddressFile extends AbstractPlaintextFile {
             unsupportedConsumer.accept(line);
             readStatistic.unsupported++;
         }
+    }
+
+    public Network getNetwork() {
+        return network;
     }
 }

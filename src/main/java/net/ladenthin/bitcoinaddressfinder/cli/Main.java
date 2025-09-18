@@ -118,8 +118,10 @@ public class Main implements Runnable, Interruptable {
         String json = configurationToJson(configuration);
         String yaml = configurationToYAML(configuration);
         logger.info(
-                "Please review the transformed configuration to ensure it aligns with your expectations and requirements before proceeding.:\n" +
-                        "########## BEGIN transformed JSON configuration ##########\n" +
+                """
+                Please review the transformed configuration to ensure it aligns with your expectations and requirements before proceeding.:
+                ########## BEGIN transformed JSON configuration ##########
+                """ +
                         json + "\n" +
                         "########## END   transformed JSON configuration ##########\n" +
                         "\n" + 
@@ -136,7 +138,7 @@ public class Main implements Runnable, Interruptable {
         addShutdownHook();
         
         switch (configuration.command) {
-            case Find:
+            case Find -> {
                 Finder finder = new Finder(configuration.finder);
                 interruptables.add(finder);
                 // key producer first
@@ -150,31 +152,26 @@ public class Main implements Runnable, Interruptable {
                 finder.initProducer();
                 finder.startProducer();
                 finder.shutdownAndAwaitTermination();
-                break;
-            case LMDBToAddressFile:
+            }
+            case LMDBToAddressFile -> {
                 LMDBToAddressFile lmdbToAddressFile = new LMDBToAddressFile(configuration.lmdbToAddressFile);
                 interruptables.add(lmdbToAddressFile);
                 lmdbToAddressFile.run();
-                break;
-            case AddressFilesToLMDB:
+            }
+            case AddressFilesToLMDB -> {
                 AddressFilesToLMDB addressFilesToLMDB = new AddressFilesToLMDB(configuration.addressFilesToLMDB);
                 interruptables.add(addressFilesToLMDB);
                 addressFilesToLMDB.run();
-                break;
-            case OpenCLInfo:
+            }
+            case OpenCLInfo -> {
                 OpenCLBuilder openCLBuilder = new OpenCLBuilder();
                 List<OpenCLPlatform> openCLPlatforms = openCLBuilder.build();
                 System.out.println(openCLPlatforms);
-                break;
-            default:
-                throw new UnsupportedOperationException("Command: " + configuration.command.name() + " currently not supported." );
+            }
+            default -> throw new UnsupportedOperationException("Command: " + configuration.command.name() + " currently not supported." );
         }
         logger.info("Main#run end.");
         runLatch.countDown();
-        
-        if (false) {
-            printAllStackTracesWithDelay(2_000L);
-        }
     }
     
     public static void printAllStackTracesWithDelay(long delayMillis) {

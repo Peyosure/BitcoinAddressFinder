@@ -235,20 +235,6 @@ public class KeyUtility {
         b[3 + offset] = (byte) (a & 0xFF);
     }
 
-    @Deprecated
-    private static void swapIntBytes(byte[] bytes) {
-        assert bytes.length % 4 == 0;
-        for (int i = 0; i < bytes.length; i += 4) {
-            // swap 0 and 3
-            byte tmp = bytes[i];
-            bytes[i] = bytes[i + 3];
-            bytes[i + 3] = tmp;
-            // swap 1 and 2
-            byte tmp2 = bytes[i + 1];
-            bytes[i + 1] = bytes[i + 2];
-            bytes[i + 2] = tmp2;
-        }
-    }
 
     /**
      * Converts a BigInteger to a fixed-length 64-character (32-byte) lowercase

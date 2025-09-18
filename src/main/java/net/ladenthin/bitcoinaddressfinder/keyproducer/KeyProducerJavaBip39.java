@@ -30,14 +30,12 @@ import org.slf4j.Logger;
 public class KeyProducerJavaBip39 extends KeyProducerJava<CKeyProducerJavaBip39> {
 
     private final KeyUtility keyUtility;
-    private final BitHelper bitHelper;
     private final SecretSupplier randomSupplier;
     private final BIP39KeyProducer bip39KeyProducer;
     
     public KeyProducerJavaBip39(CKeyProducerJavaBip39 cKeyProducerJavaBip39, KeyUtility keyUtility, BitHelper bitHelper, Logger logger) {
         super(cKeyProducerJavaBip39, logger);
         this.keyUtility = keyUtility;
-        this.bitHelper = bitHelper;
         
         bip39KeyProducer = new BIP39KeyProducer(
             cKeyProducerJavaBip39.mnemonic,

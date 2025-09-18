@@ -18,17 +18,14 @@
 // @formatter:on
 package net.ladenthin.bitcoinaddressfinder;
 
-import net.ladenthin.bitcoinaddressfinder.keyproducer.NoMoreSecretsAvailableException;
+
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicBoolean;
-import net.ladenthin.bitcoinaddressfinder.BitHelper;
-import net.ladenthin.bitcoinaddressfinder.Consumer;
-import net.ladenthin.bitcoinaddressfinder.KeyUtility;
-import net.ladenthin.bitcoinaddressfinder.Producer;
-import net.ladenthin.bitcoinaddressfinder.ProducerState;
+
 import net.ladenthin.bitcoinaddressfinder.configuration.CProducer;
 import net.ladenthin.bitcoinaddressfinder.keyproducer.KeyProducer;
 import net.ladenthin.bitcoinaddressfinder.keyproducer.NoMoreSecretsAvailableException;
+
 import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +54,14 @@ public abstract class AbstractProducer implements Producer {
         this.keyUtility = keyUtility;
         this.keyProducer = keyProducer;
         this.bitHelper = bitHelper;
+    }
+
+    public AbstractProducer(BitHelper bitHelper, CProducer cProducer, Consumer consumer, KeyProducer keyProducer, KeyUtility keyUtility) {
+        this.bitHelper = bitHelper;
+        this.cProducer = cProducer;
+        this.consumer = consumer;
+        this.keyProducer = keyProducer;
+        this.keyUtility = keyUtility;
     }
 
     @Override
@@ -169,6 +174,7 @@ public abstract class AbstractProducer implements Producer {
         return secretBase;
     }
     
+    @SuppressWarnings("unused")
     public static BigInteger calculateSecretKey(BigInteger secretBase, int keyNumber) {
         if (false) {
             // works also but a or might be faster
@@ -193,5 +199,9 @@ public abstract class AbstractProducer implements Producer {
     @Override
     public ProducerState getState() {
         return state;
+    }
+
+    public Consumer getConsumer() {
+        return consumer;
     }
 }

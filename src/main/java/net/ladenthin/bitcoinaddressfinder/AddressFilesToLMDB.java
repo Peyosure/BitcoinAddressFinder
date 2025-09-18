@@ -116,7 +116,7 @@ public class AddressFilesToLMDB implements Runnable, Interruptable {
         }
     }
 
-    private void unsupported(String line) {
+    private void unsupported() {
         if (readStatistic.unsupported % PROGRESS_LOG == 0) {
             logProgress();
         }

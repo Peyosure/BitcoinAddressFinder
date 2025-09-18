@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 public class KeyProducerJavaRandom extends KeyProducerJava<CKeyProducerJavaRandom> {
 
     private final KeyUtility keyUtility;
-    private final BitHelper bitHelper;
     private final SecretSupplier randomSupplier;
     
     /**
@@ -43,26 +42,23 @@ public class KeyProducerJavaRandom extends KeyProducerJava<CKeyProducerJavaRando
     public KeyProducerJavaRandom(CKeyProducerJavaRandom cKeyProducerJavaRandom, KeyUtility keyUtility, BitHelper bitHelper, Logger logger) {
         super(cKeyProducerJavaRandom, logger);
         this.keyUtility = keyUtility;
-        this.bitHelper = bitHelper;
         
         switch (cKeyProducerJavaRandom.keyProducerJavaRandomInstance) {
-            case SECURE_RANDOM:
+            case SECURE_RANDOM -> {
                 try {
                     random = SecureRandom.getInstanceStrong();
                 } catch (NoSuchAlgorithmException e) {
                     throw new RuntimeException(e);
                 }
-                break;
-            case RANDOM_CURRENT_TIME_MILLIS_SEED:
-                random = new Random(System.currentTimeMillis());
-                break;
-            case RANDOM_CUSTOM_SEED:
+            }
+            case RANDOM_CURRENT_TIME_MILLIS_SEED -> random = new Random(System.currentTimeMillis());
+            case RANDOM_CUSTOM_SEED -> {
                 random = new Random();
                 if (cKeyProducerJavaRandom.customSeed != null) {
                     random.setSeed(cKeyProducerJavaRandom.customSeed); // only if explicitly configured
                 }
-                break;
-            case SHA1_PRNG:
+            }
+            case SHA1_PRNG -> {
                 try {
                     random = SecureRandom.getInstance("SHA1PRNG");
                     
@@ -73,9 +69,8 @@ public class KeyProducerJavaRandom extends KeyProducerJava<CKeyProducerJavaRando
                 } catch (NoSuchAlgorithmException e) {
                     throw new RuntimeException(e);
                 }
-                break;
-            default:
-                throw new RuntimeException("Unknown keyProducerJavaRandomInstance: " + cKeyProducerJavaRandom.keyProducerJavaRandomInstance);
+            }
+            default -> throw new RuntimeException("Unknown keyProducerJavaRandomInstance: " + cKeyProducerJavaRandom.keyProducerJavaRandomInstance);
         }
         randomSupplier = new RandomSecretSupplier(random);
     }
