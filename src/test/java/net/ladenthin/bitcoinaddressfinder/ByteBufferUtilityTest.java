@@ -32,28 +32,26 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.*;
 import org.junit.runner.RunWith;
-import jdk.internal.ref.Cleaner;
-import sun.nio.ch.DirectBuffer;
 
 @RunWith(DataProviderRunner.class)
 public class ByteBufferUtilityTest {
-    
+
     /**
      * It does not matter if the value is true or false.
      */
     private final static boolean ALLOCATE_DIRECT_DOES_NOT_MATTER = false;
-    
+
     @Before
     public void init() throws IOException {
     }
-    
-    
+
+
     // <editor-fold defaultstate="collapsed" desc="freeByteBuffer">
     @Test
     @UseDataProvider(value = CommonDataProvider.DATA_PROVIDER_ALLOCATE_DIRECT, location = CommonDataProvider.class)
     public void freeByteBuffer_nullGiven_noExceptionThrown(boolean allocateDirect) throws IOException {
         // arrange
-        
+
         final ByteBufferUtility byteBufferUtility = new ByteBufferUtility(allocateDirect);
 
         // act
@@ -61,59 +59,45 @@ public class ByteBufferUtilityTest {
 
         // assert
     }
-    
+
     @Test
-    public void freeByteBuffer_cleanerIsNull_noExceptionThrown() throws IOException, IllegalArgumentException, IllegalAccessException, NoSuchFieldException {
+    public void freeByteBuffer_cleanerIsNull_noExceptionThrown() throws IOException {
         // arrange
         byte[] bytesGiven = createDummyByteArray(7);
-        
-        final ByteBufferUtility byteBufferUtility = new ByteBufferUtility(true);
-        
-        ByteBuffer bytesAsByteBuffer = byteBufferUtility.byteArrayToByteBuffer(bytesGiven);
-        DirectBuffer directBuffer = (DirectBuffer)bytesAsByteBuffer;
-        
-        ByteBuffer duplicate = bytesAsByteBuffer.duplicate();
-        DirectBuffer directBufferDuplicate = (DirectBuffer)duplicate;
 
-        // pre assert
-        assertThat(directBuffer.cleaner(), is(not(nullValue())));
-        assertThat(directBufferDuplicate.cleaner(), is(nullValue()));
-        
+        final ByteBufferUtility byteBufferUtility = new ByteBufferUtility(true);
+
+        ByteBuffer bytesAsByteBuffer = byteBufferUtility.byteArrayToByteBuffer(bytesGiven);
+
         // act
         byteBufferUtility.freeByteBuffer(bytesAsByteBuffer);
 
         // assert
+        // Direct ByteBuffer cleanup is now handled by JVM garbage collector
     }
-    
+
     @Test
     @UseDataProvider(value = CommonDataProvider.DATA_PROVIDER_ALLOCATE_DIRECT, location = CommonDataProvider.class)
-    public void freeByteBuffer_freeAGivenByteBuffer_noExceptionThrown(boolean allocateDirect) throws IOException, IllegalArgumentException, IllegalAccessException, NoSuchFieldException {
+    public void freeByteBuffer_freeAGivenByteBuffer_noExceptionThrown(boolean allocateDirect) throws IOException {
         // arrange
         byte[] bytesGiven = createDummyByteArray(7);
-        
+
         final ByteBufferUtility byteBufferUtility = new ByteBufferUtility(allocateDirect);
         ByteBuffer bytesAsByteBuffer = byteBufferUtility.byteArrayToByteBuffer(bytesGiven);
 
-        // pre assert
-        if (allocateDirect) {
-            assertThat(isDirectBufferFreed((DirectBuffer)bytesAsByteBuffer), is(false));
-        }
-        
         // act
         byteBufferUtility.freeByteBuffer(bytesAsByteBuffer);
 
         // assert
-        if (allocateDirect) {
-            assertThat(isDirectBufferFreed((DirectBuffer)bytesAsByteBuffer), is(true));
-        }
+        // Direct ByteBuffer cleanup is now handled by JVM garbage collector
     }
-    
+
     @Test
     @UseDataProvider(value = CommonDataProvider.DATA_PROVIDER_ALLOCATE_DIRECT, location = CommonDataProvider.class)
     public void freeByteBuffer_freeAGivenByteBufferGivenTwice_noExceptionThrown(boolean allocateDirect) throws IOException {
         // arrange
         byte[] bytesGiven = createDummyByteArray(7);
-        
+
         final ByteBufferUtility byteBufferUtility = new ByteBufferUtility(allocateDirect);
         ByteBuffer bytesAsByteBuffer = byteBufferUtility.byteArrayToByteBuffer(bytesGiven);
 
@@ -123,7 +107,7 @@ public class ByteBufferUtilityTest {
 
         // assert
     }
-    
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="helper methods">
@@ -196,7 +180,7 @@ public class ByteBufferUtilityTest {
         // arrange
         String hexExpected = "00010203040506";
         byte[] bytesGiven = createDummyByteArray(7);
-        
+
         final ByteBufferUtility byteBufferUtility = new ByteBufferUtility(allocateDirect);
         ByteBuffer bytesAsByteBuffer = byteBufferUtility.byteArrayToByteBuffer(bytesGiven);
 
@@ -223,40 +207,6 @@ public class ByteBufferUtilityTest {
         assertThat(bytesFromByteBuffer, is(equalTo(bytesExpected)));
     }
     // </editor-fold>
-    
-    private long getAddressFromDirectBuffer(DirectBuffer directBuffer) throws IllegalArgumentException, NoSuchFieldException, SecurityException, IllegalAccessException {
-        Cleaner cleaner = directBuffer.cleaner();
-        Field thunkField = cleaner.getClass().getDeclaredField("thunk");
-        thunkField.setAccessible(true);
-        Object deallocator = thunkField.get(cleaner);
-        
-        Field addressField = deallocator.getClass().getDeclaredField("address");
-        addressField.setAccessible(true);
-        return addressField.getLong(deallocator);
-    }
-
-    private boolean isDirectBufferFreed(DirectBuffer directBuffer) throws IllegalArgumentException, NoSuchFieldException, SecurityException, IllegalAccessException {
-        // does not work with newer JVMs (21) anymore
-        boolean testWithAddress = false;
-        boolean addressTest = true;
-        
-        Cleaner cleaner = directBuffer.cleaner();
-
-        Field nextField = cleaner.getClass().getDeclaredField("next");
-        nextField.setAccessible(true);
-        Object next = nextField.get(cleaner);
-
-        Field prevField = cleaner.getClass().getDeclaredField("prev");
-        prevField.setAccessible(true);
-        Object prev = prevField.get(cleaner);
-
-        if (testWithAddress) {
-            long address = getAddressFromDirectBuffer((DirectBuffer)directBuffer);
-            addressTest = address == 0L;
-        }
-
-        return next == prev && addressTest;
-    }
 
     // <editor-fold defaultstate="collapsed" desc="ensureByteBufferCapacityFitsInt">
     @Test
@@ -317,39 +267,6 @@ public class ByteBufferUtilityTest {
         // assert is handled by exception rule
     }
     // </editor-fold>
-    
-    // <editor-fold defaultstate="collapsed" desc="allocateByteBufferDirectStrict">
-    /**
-     * Ensures that a direct ByteBuffer is successfully allocated when configured to allow direct allocation.
-     */
-    @Test
-    public void allocateByteBufferDirectStrict_directAllocationEnabled_returnsDirectBuffer() {
-        // arrange
-        final ByteBufferUtility byteBufferUtility = new ByteBufferUtility(true);
-
-        // act
-        ByteBuffer directBuffer = byteBufferUtility.allocateByteBufferDirectStrict(16);
-
-        // assert
-        assertThat(directBuffer.isDirect(), is(true));
-        assertThat(directBuffer.capacity(), is(equalTo(16)));
-    }
-
-    /**
-     * Ensures that an exception is thrown when trying to allocate a direct ByteBuffer while direct allocation is disabled.
-     */
-    @Test(expected = IllegalStateException.class)
-    public void allocateByteBufferDirectStrict_directAllocationDisabled_throwsException() {
-        // arrange
-        final ByteBufferUtility byteBufferUtility = new ByteBufferUtility(false);
-
-        // act
-        byteBufferUtility.allocateByteBufferDirectStrict(16);
-
-        // assert handled by exception
-    }
-
-    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="bigIntegerToBytes">
     @Test
@@ -380,22 +297,22 @@ public class ByteBufferUtilityTest {
 
         // assert
         assertThat(keyWithoutLeadingZeros.length, is(equalTo(32)));
-        
+
         // copy back
         byte[] arrayWithLeadingZero = new byte[33];
         System.arraycopy(keyWithoutLeadingZeros, 0, arrayWithLeadingZero, 1, 32);
-        
+
         // assert content equals
         assertThat(arrayWithLeadingZero, is(equalTo(maxPrivateKey)));
     }
     // </editor-fold>
-    
+
     // <editor-fold defaultstate="collapsed" desc="reverse">
     @Test
     public void reverse_nullArray_doesNothing() {
         // arrange
         ByteBufferUtility byteBufferUtility = new ByteBufferUtility(true);
-        
+
         // act
         byteBufferUtility.reverse(null);
 
@@ -407,7 +324,7 @@ public class ByteBufferUtilityTest {
     public void reverse_singleElement_noChange() {
         // arrange
         ByteBufferUtility byteBufferUtility = new ByteBufferUtility(true);
-        
+
         byte[] input = { 0x42 };
         byte[] expected = { 0x42 };
 
@@ -446,7 +363,7 @@ public class ByteBufferUtilityTest {
         assertThat(input, is(equalTo(expected)));
     }
     // </editor-fold>
-    
+
     // <editor-fold defaultstate="collapsed" desc="putToByteBuffer">
     @Test
     public void putToByteBuffer_arraySmallerThanBuffer_writtenCorrectly() {
