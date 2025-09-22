@@ -1,6 +1,6 @@
 // @formatter:off
 /**
- * Copyright 2020 Bernard Ladenthin bernard.ladenthin@gmail.com
+ * Copyright 2020 Bernard loadnetbin bernard.loadnetbin@gmail.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,13 +42,13 @@ import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
-// VM option: -Dorg.slf4j.simpleLogger.defaultLogLevel=trace
+// VM option: -dOrg.slf4j.simpleLogger.defaultLogLevel=trace
 public class Main implements Runnable, Interruptable {
 
     @VisibleForTesting
     public static Logger logger = LoggerFactory.getLogger(Main.class);
 
-    private final List<Interruptable> interruptables = new ArrayList<>();
+    private final List<Interruptable> interruptibles = new ArrayList<>();
 
     private final CConfiguration configuration;
     
@@ -81,8 +81,8 @@ public class Main implements Runnable, Interruptable {
     
     public static String configurationToJson(CConfiguration configuration) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(configuration);
-        return json;
+        String jsonString = gson.toJson(configuration);
+        return jsonString;
     }
     
     public static String configurationToYAML(CConfiguration configuration) {
@@ -140,13 +140,13 @@ public class Main implements Runnable, Interruptable {
         switch (configuration.command) {
             case Find -> {
                 Finder finder = new Finder(configuration.finder);
-                interruptables.add(finder);
+                interruptibles.add(finder);
                 // key producer first
                 finder.startKeyProducer();
-                
+
                 // consumer second
                 finder.startConsumer();
-                
+
                 // producer last
                 finder.configureProducer();
                 finder.initProducer();
@@ -155,12 +155,12 @@ public class Main implements Runnable, Interruptable {
             }
             case LMDBToAddressFile -> {
                 LMDBToAddressFile lmdbToAddressFile = new LMDBToAddressFile(configuration.lmdbToAddressFile);
-                interruptables.add(lmdbToAddressFile);
+                interruptibles.add(lmdbToAddressFile);
                 lmdbToAddressFile.run();
             }
             case AddressFilesToLMDB -> {
                 AddressFilesToLMDB addressFilesToLMDB = new AddressFilesToLMDB(configuration.addressFilesToLMDB);
-                interruptables.add(addressFilesToLMDB);
+                interruptibles.add(addressFilesToLMDB);
                 addressFilesToLMDB.run();
             }
             case OpenCLInfo -> {
@@ -207,7 +207,7 @@ public class Main implements Runnable, Interruptable {
     
     @Override
     public void interrupt() {
-        for (Interruptable interruptable : interruptables) {
+        for (Interruptable interruptable : interruptibles) {
             interruptable.interrupt();
         }
     }

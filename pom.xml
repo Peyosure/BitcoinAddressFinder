@@ -9,7 +9,7 @@
     <packaging>jar</packaging>
 
     <name>bitcoinaddressfinder</name>
-    <description>Free high performance tool for fast scanning random Bitcoin, Bitcoin Cash, Bitcoin SV, Litecoin, Dogecoin, Dash, Zcash (and many more) private keys and finding addresses with balance.</description>
+    <description>Free high performance tool for fast scanning random bitcoin, bitcoin Cash, bitcoin SV, Litecoin, Dogecoin, Dash, Zcash (and many more) private keys and finding addresses with balance.</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slf4j.version>2.0.17</slf4j.version>
@@ -210,7 +210,7 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.13.2</version>
+            <version>2.10.1</version>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
