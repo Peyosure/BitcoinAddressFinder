@@ -44,12 +44,12 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 // VM option: -dOrg.slf4j.simpleLogger.defaultLogLevel=trace
-public class Main implements Runnable, Interruptable {
+public class Main implements Runnable, Interruptible {
 
     @VisibleForTesting
     public static Logger logger = LoggerFactory.getLogger(Main.class);
 
-    private final List<Interruptable> interruptibles = new ArrayList<>();
+    private final List<Interruptible> interruptibles = new ArrayList<>();
 
     private final CConfiguration configuration;
     
